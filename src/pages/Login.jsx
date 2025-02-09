@@ -10,7 +10,6 @@ export const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // TODO: Implement login logic
     toast.success('Login functionality will be implemented soon');
   };
 
