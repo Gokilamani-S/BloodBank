@@ -61,4 +61,4 @@ export const Login = () => {
     </div>
   );
 };
-export default ManagerDashboard;
+export default Login;
