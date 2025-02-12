@@ -6,11 +6,17 @@ import { useNavigate } from 'react-router-dom';
 import jsPDF from 'jspdf';
 
 const AdminDashboard = () => {
-   const { user, logout } = useAuthStore();
+
   
   const [bloodBanks, setBloodBanks] = useState([]);
   const [recentTransfers, setRecentTransfers] = useState([]);
   const [showModal, setShowModal] = useState(false);
+
+  const navigate = useNavigate(); // Use useNavigate for navigation
+  const logout = () => {
+    navigate('/'); 
+  };
+
 
   useEffect(() => {
     fetch('/api/bloodBanks')
