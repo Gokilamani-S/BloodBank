@@ -2,48 +2,43 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Droplet } from "lucide-react";
 import toast from "react-hot-toast";
-import { useAuthStore } from "../store/authStore"; // Import authentication store
+import axios from "axios";
 
 export const Login = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
   const navigate = useNavigate();
-  const setUser = useAuthStore((state) => state.setUser); // Update user in global store
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+
+    if (formData.email === "admin@gmail.com" && formData.password === "admin") {
+      localStorage.setItem("role", "admin");
+      navigate("/admin-dashboard");
+      toast.success("Admin login successful!");
+      return;
+    }
+
     try {
-      const response = await fetch("http://localhost:5000/login", {
-        method: "POST",
+      const res = await axios.post("http://localhost:5000/login", formData, {
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
       });
 
-      const data = await response.json();
-      console.log("Login Response:", data); // Debugging
+      console.log("Server Response:", res.data);
 
-      if (response.ok && data.role) {
-        setUser({ email: data.email, role: data.role }); // Save user in store
+      if (res.status === 200) {
+        localStorage.setItem("email", formData.email); 
+
+    
+        navigate("/donor-dashboard");
         toast.success("Login successful!");
-
-        // Delay navigation slightly for better UX
-        setTimeout(() => {
-          navigate(
-            data.role === "admin"
-              ? "/admin-dashboard"
-              : data.role === "manager"
-              ? "/manager-dashboard"
-              : data.role === "donor"
-              ? "/donor-dashboard"
-              : "/login"
-          );
-        }, 500);
-      } else {
-        toast.error(data.message || "Invalid credentials");
       }
-    } catch (error) {
-      toast.error("Error connecting to server");
+    } catch (err) {
+      console.error("Login Error:", err);
+      toast.error(err.response?.data?.message || "Login failed");
     }
   };
 
@@ -53,15 +48,15 @@ export const Login = () => {
         <Droplet className="h-12 w-12 text-red-500" />
         <h1 className="text-2xl font-bold ml-2">Blood Bank Connect</h1>
       </div>
-      
+
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
           <label className="block text-sm font-medium text-gray-700">Email</label>
           <input
             type="email"
             required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            value={formData.email}
+            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
             className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-red-500 focus:outline-none focus:ring-red-500"
           />
         </div>
@@ -71,8 +66,8 @@ export const Login = () => {
           <input
             type="password"
             required
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            value={formData.password}
+            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
             className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-red-500 focus:outline-none focus:ring-red-500"
           />
         </div>
@@ -86,7 +81,7 @@ export const Login = () => {
       </form>
 
       <p className="mt-4 text-center text-sm text-gray-600">
-        Don't have an account?{' '}
+        Don't have an account?{" "}
         <Link to="/signup" className="font-medium text-red-600 hover:text-red-500">
           Sign up
         </Link>

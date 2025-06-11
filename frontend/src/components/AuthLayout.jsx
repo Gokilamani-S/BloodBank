@@ -5,18 +5,9 @@ import { useAuthStore } from '../store/authStore';
 const AuthLayout = () => {
   const { user } = useAuthStore();
 
-  // Redirect logged-in users to the correct dashboard
-  if (user?.role) {
-    const dashboardRoute =
-      user.role === "admin"
-        ? "/admin-dashboard"
-        : user.role === "manager"
-        ? "/manager-dashboard"
-        : user.role === "donor"
-        ? "/donor-dashboard"
-        : "/login"; // Default fallback
-
-    return <Navigate to={dashboardRoute} replace />;
+  // Redirect to donor dashboard only if email and password exist
+  if (user?.email && user?.password) {
+    return <Navigate to="/donor-dashboard" replace />;
   }
 
   return (
